@@ -24,10 +24,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Robot extends TimedRobot {
 /* Talon SRX 6 is claw Talon SRX 5 is pitch Talon SRX 9 is I/O */
-  private final TalonSRX m_motordrive_pitch = new TalonSRX(5);
-  private final TalonSRX m_motordrive_io = new TalonSRX(9);
-  private final DutyCycleEncoder m_encoder_pitch = new DutyCycleEncoder (0); // pitch
-  private final DutyCycleEncoder m_encoder_io = new DutyCycleEncoder (5); // IO
+  //private final TalonSRX m_motordrive_pitch = new TalonSRX(5);
+  //private final TalonSRX m_motordrive_io = new TalonSRX(9);
+  //private final DutyCycleEncoder m_encoder_pitch = new DutyCycleEncoder (0); // pitch
+  //private final DutyCycleEncoder m_encoder_io = new DutyCycleEncoder (5); // IO
+  
+  private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
+
   private final XboxController m_controller = new XboxController(0);
   private final Timer m_timer = new Timer();
 
@@ -61,18 +64,21 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
    // m_robotDrive.arcadeDrive(-m_controller.getLeftY(), -m_controller.getRightX());
-   double output_pitch = m_encoder_pitch.get();
-   double output_io = m_encoder_io.get();
+   double output_pitch = m_armSubsystem.getPosPitch();
+   double output_reach = m_armSubsystem.getPosReach();
    double control_pitch = m_controller.getRawAxis(1); // Left Stick Vertical
-   double control_io = m_controller.getRawAxis(2); // Right Stick Horizontal
+   double control_reach = m_controller.getRawAxis(3); // Right Stick Horizontal
 
    SmartDashboard.putNumber("encoder_pitch", output_pitch);
-   SmartDashboard.putNumber("encoder_io", output_io);
+   SmartDashboard.putNumber("encoder_reach", output_reach);
    SmartDashboard.putNumber("controller_left_1", control_pitch);
-   SmartDashboard.putNumber("controller_right_2", control_io);
+   SmartDashboard.putNumber("controller_right_2", control_reach);
 
-   m_motordrive_pitch.set(ControlMode.PercentOutput, control_pitch*0.5);
-   m_motordrive_io.set(ControlMode.PercentOutput, control_io*0.5);
+  m_armSubsystem.movePitch(control_pitch);
+  m_armSubsystem.moveReach(control_reach);
+
+   //m_motordrive_pitch.set(ControlMode.PercentOutput, control_pitch*0.5);
+   //m_motordrive_io.set(ControlMode.PercentOutput, control_reach*0.5);
 }
 
   /** This function is called once each time the robot enters test mode. */
